@@ -1,12 +1,15 @@
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 
 import java.util.Map;
 import java.util.Scanner;
+
+
 import java.util.LinkedHashMap;
 import java.time.LocalDate;
 import java.util.List;
@@ -44,10 +47,16 @@ public class InnReservation {
 					stmt.execute("INSERT INTO hp_goods (GId, Flavor, Food, Price) VALUES ('A4', 'Almond', 'Cookie', 4.50)");
 					stmt.execute("INSERT INTO hp_goods (GId, Flavor, Food, Price) VALUES ('L5', 'Lemon', 'Cookie', 1.50)");
 					stmt.execute("INSERT INTO hp_goods (GId, Flavor, Food, Price) VALUES ('A6', 'Almond', 'Danish', 2.50)");
+
+					//lab7_reservations
 					stmt.execute("DROP TABLE IF EXISTS lab7_reservations");
-					stmt.execute("CREATE TABLE lab7_reservations(Code INT(2), Room CHAR(5), CheckIn DATE, Checkout DATE, Rate FLOAT, LastName VARCHAR(15), FirstName VARCHAR(15), Adults INT(3), Kids INT(3),PRIMARY KEY (Code))");
+					stmt.execute("CREATE TABLE lab7_reservations(Code INT(11), Room CHAR(5), CheckIn DATE, Checkout DATE, Rate FLOAT, LastName VARCHAR(15), FirstName VARCHAR(15), Adults INT(3), Kids INT(3),PRIMARY KEY (Code))");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10105, 'HBB', '2010-10-23', '2010-10-25', 100, 'SLEBIG', 'CONRAD', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10183, 'IBD', '2010-09-19', '2010-09-20', 150, 'GABLER', 'DOLLIE', 2, 0)");
 
 					stmt.execute("DROP TABLE IF EXISTS lab7_rooms");
+					stmt.execute("CREATE TABLE lab7_rooms(RoomCode CHAR(5), RoomName VARCHAR(30), Beds INT(3), BedType VARCHAR(8), MaxOcc INT(3), BasePrice FLOAT, Decor VARCHAR(20))");
+					stmt.execute("INSERT INTO lab7_rooms (RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor) VALUES ('IBD', 'Immutable before decorum', 2, 'Queen', 4, 150, 'rustic')");
 			}
 		}
 	}
@@ -70,19 +79,44 @@ public class InnReservation {
 							   JDBC_USER,
 							   JDBC_PASSWORD)) {
 	    // Step 2: Construct SQL statement
-	    String sql = "ALTER TABLE hp_goods ADD COLUMN AvailUntil DATE";
+		String sql = "SELECT * FROM lab7_reservations";
+		String sql1 = "SELECT * FROM lab7_rooms";
 
 	    // Step 3: (omitted in this example) Start transaction
 
 	    try (Statement stmt = conn.createStatement()) {
 
 		// Step 4: Send SQL statement to DBMS
-		boolean exRes = stmt.execute(sql);
+		ResultSet rs = stmt.executeQuery(sql);
 		
 		// Step 5: Handle results
-		System.out.format("Result from ALTER: %b %n", exRes);
-	    }
-
+		while (rs.next())
+		{
+			Integer code = rs.getInt("Code");
+			String room = rs.getString("Room");
+			Date checkIn = rs.getDate("CheckIn");
+			Date checkOut = rs.getDate("Checkout");
+			Float rate = rs.getFloat("Rate");
+			String lastName = rs.getString("LastName");
+			String firstName = rs.getString("FirstName");
+			Integer adults = rs.getInt("Adults");
+			Integer kids = rs.getInt("Kids");
+			System.out.format("%d, %s, %s, %s, %.2f, %s, %s, %d, %d %n", code, room, checkIn, checkOut, rate, lastName, firstName, adults, kids);
+		}
+		
+		rs = stmt.executeQuery(sql1);
+		while (rs.next())
+		{
+			String roomCode = rs.getString("RoomCode");
+			String roomName = rs.getString("RoomName");
+			Integer beds = rs.getInt("Beds");
+			String bedType = rs.getString("BedType");
+			Integer maxOcc = rs.getInt("MaxOcc");
+			Float basePrice = rs.getFloat("BasePrice");
+			String decor = rs.getString("Decor");
+			System.out.format("%s, %s, %d, %s, %d, %.2f, %s", roomCode, roomName, beds, bedType, maxOcc, basePrice, decor);
+		}
+	}
 	    // Step 6: (omitted in this example) Commit or rollback transaction
 	}
 	// Step 7: Close connection (handled by try-with-resources syntax)
