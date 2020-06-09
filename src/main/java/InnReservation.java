@@ -67,9 +67,7 @@ public class InnReservation {
 								   JDBC_PASSWORD)) {
 			try (Statement stmt = conn.createStatement()) {
 					stmt.execute("DROP TABLE IF EXISTS hp_goods");
-					boolean testCreateTable = stmt.execute("CREATE TABLE hp_goods (GId varchar(15) PRIMARY KEY, Food varchar(100), Flavor varchar(100), Price DECIMAL(5,1), AvailUntil DATE)");
-					System.out.format("Here: %b %n", testCreateTable);
-
+					stmt.execute("CREATE TABLE hp_goods (GId varchar(15) PRIMARY KEY, Food varchar(100), Flavor varchar(100), Price DECIMAL(5,1), AvailUntil DATE)");
 					stmt.execute("INSERT INTO hp_goods (GId, Flavor, Food, Price) VALUES ('L1', 'Lemon', 'Cake', 20.0)");
 					stmt.execute("INSERT INTO hp_goods (GId, Flavor, Food, Price) VALUES ('L2', 'Lemon', 'Twist', 3.50)");
 					stmt.execute("INSERT INTO hp_goods (GId, Flavor, Food, Price) VALUES ('A3', 'Almond', 'Twist', 4.50)");
@@ -77,7 +75,7 @@ public class InnReservation {
 					stmt.execute("INSERT INTO hp_goods (GId, Flavor, Food, Price) VALUES ('L5', 'Lemon', 'Cookie', 1.50)");
 					stmt.execute("INSERT INTO hp_goods (GId, Flavor, Food, Price) VALUES ('A6', 'Almond', 'Danish', 2.50)");
 					stmt.execute("DROP TABLE IF EXISTS lab7_reservations");
-					stmt.execute("CREATE TABLE lab7_reservations(Code INT(2), Room CHAR(5), CheckIn DATE, Checkout DATE, Rate FLOAT, LastName VARCHAR(15), FirstName VARCHAR(15), Adults INT(3), Kids INT(3),PRIMARY KEY (Code));");
+					stmt.execute("CREATE TABLE lab7_reservations(Code INT(2), Room CHAR(5), CheckIn DATE, Checkout DATE, Rate FLOAT, LastName VARCHAR(15), FirstName VARCHAR(15), Adults INT(3), Kids INT(3),PRIMARY KEY (Code))");
 
 					stmt.execute("DROP TABLE IF EXISTS lab7_rooms");
 			}
