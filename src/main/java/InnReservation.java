@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /*
 Introductory JDBC examples based loosely on the BAKERY dataset from CSC 365 labs.
  */
-public class HastyPastry {
+public class InnReservation {
 
     private final String JDBC_URL = "jdbc:h2:~/csc365_lab7";
     private final String JDBC_USER = "";
@@ -23,9 +23,9 @@ public class HastyPastry {
     
     public static void main(String[] args) {
 	try {
-	    HastyPastry hp = new HastyPastry();
+	    InnReservation hp = new InnReservation();
             hp.initDb();
-	    hp.demo3();
+	    hp.demo1();
 	} catch (SQLException e) {
 	    System.err.println("SQLException: " + e.getMessage());
 	}
