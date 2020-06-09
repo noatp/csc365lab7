@@ -25,13 +25,43 @@ public class InnReservation {
     private final String JDBC_PASSWORD = "";
     
     public static void main(String[] args) {
-	try {
-	    InnReservation hp = new InnReservation();
-            hp.initDb();
-	    hp.demo1();
-	} catch (SQLException e) {
-	    System.err.println("SQLException: " + e.getMessage());
+		try {
+			String option;
+			InnReservation hp = new InnReservation();
+			hp.initDb();
+			// hp.demo1();
+			printOption();
+			while(!(option = new Scanner(System.in).next()).equals("Q"))
+			{
+				switch(option) {
+					case "FR1":
+						break;
+					case "FR2":
+						break;
+					case "FR3":
+						break;
+					case "FR4":
+						break;
+					case "FR5":
+						break;
+					case "Q":
+						System.exit(0);
+					default:
+						System.out.println("Error: Command not found");
+						printOption();
+						break;
+				}
+			}
+
+		} catch (SQLException e) {
+			System.err.println("SQLException: " + e.getMessage());
+		}
 	}
+
+	public static void printOption() {
+		System.out.println("\nPlease choose one of the following options:");
+		System.out.println("FR1: Rooms and Rates\nFR2: Reservations\nFR3: Reservation Change\nFR4: Reservation Cancellation\nFR5: Revenue Summary\nQ: Quit");
+		System.out.print("Your option: ");
 	}
 	
 	private void initDb() throws SQLException {
