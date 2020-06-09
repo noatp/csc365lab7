@@ -114,6 +114,7 @@ public class InnReservation {
 			Integer maxOcc = rs.getInt("MaxOcc");
 			Float basePrice = rs.getFloat("BasePrice");
 			String decor = rs.getString("Decor");
+			
 			System.out.format("%s, %s, %d, %s, %d, %.2f, %s", roomCode, roomName, beds, bedType, maxOcc, basePrice, decor);
 		}
 	}
