@@ -22,13 +22,43 @@ public class InnReservation {
     private final String JDBC_PASSWORD = "";
     
     public static void main(String[] args) {
-	try {
-	    InnReservation hp = new InnReservation();
-            hp.initDb();
-	    hp.demo1();
-	} catch (SQLException e) {
-	    System.err.println("SQLException: " + e.getMessage());
+		try {
+			String option;
+			InnReservation hp = new InnReservation();
+			hp.initDb();
+			// hp.demo1();
+			printOption();
+			while(!(option = new Scanner(System.in).next()).equals("Q"))
+			{
+				switch(option) {
+					case "FR1":
+						break;
+					case "FR2":
+						break;
+					case "FR3":
+						break;
+					case "FR4":
+						break;
+					case "FR5":
+						break;
+					case "Q":
+						System.exit(0);
+					default:
+						System.out.println("Error: Command not found");
+						printOption();
+						break;
+				}
+			}
+
+		} catch (SQLException e) {
+			System.err.println("SQLException: " + e.getMessage());
+		}
 	}
+
+	public static void printOption() {
+		System.out.println("\nPlease choose one of the following options:");
+		System.out.println("FR1: Rooms and Rates\nFR2: Reservations\nFR3: Reservation Change\nFR4: Reservation Cancellation\nFR5: Revenue Summary\nQ: Quit");
+		System.out.print("Your option: ");
 	}
 	
 	private void initDb() throws SQLException {
@@ -47,7 +77,7 @@ public class InnReservation {
 					stmt.execute("INSERT INTO hp_goods (GId, Flavor, Food, Price) VALUES ('L5', 'Lemon', 'Cookie', 1.50)");
 					stmt.execute("INSERT INTO hp_goods (GId, Flavor, Food, Price) VALUES ('A6', 'Almond', 'Danish', 2.50)");
 					stmt.execute("DROP TABLE IF EXISTS lab7_reservations");
-					stmt.execute("CREATE TABLE lab7_reservations(Code INT(2), Room CHAR(5), CheckIn DATE, Checkout DATE, Rate FLOAT(5,2), LastName VARCHAR(15), FirstName VARCHAR(15), Adults INT(3), Kids INT(3),PRIMARY KEY (Code));");
+					stmt.execute("CREATE TABLE lab7_reservations(Code INT(2), Room CHAR(5), CheckIn DATE, Checkout DATE, Rate FLOAT, LastName VARCHAR(15), FirstName VARCHAR(15), Adults INT(3), Kids INT(3),PRIMARY KEY (Code));");
 
 					stmt.execute("DROP TABLE IF EXISTS lab7_rooms");
 			}
