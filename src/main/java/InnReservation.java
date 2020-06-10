@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.util.Map;
 import java.util.Scanner;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
 
 import java.util.LinkedHashMap;
 import java.time.LocalDate;
@@ -41,9 +42,12 @@ public class InnReservation {
 						hp.fr1();
 						break;
 					case "FR2":
+						System.out.println("Please input first name, last name, room code, begin date, end date, number of children and number of adult in a comma separated list");
 						hp.fr2(hp.parseReservationInput());
 						break;
 					case "FR3":
+						System.out.println("Please input reservation code, first name, last name, begin date, end date, number of children and number of adult in a comma separated list, OR ENTER NC IF NO CHANGE IS NEEDED");
+						hp.fr3(hp.parseReservationInput());
 						break;
 					case "FR4":
 						break;
@@ -272,7 +276,6 @@ public class InnReservation {
 
 	private String[] parseReservationInput()
 	{
-		System.out.println("Please input first name, last name, room code, begin date, end date, number of children and number of adult in a comma separated list");
 		String[] returnResult;
 		try
 		{
@@ -344,6 +347,94 @@ public class InnReservation {
 
 		}
 	}
+
+	private void fr3(String[] userInput) throws SQLException
+	{
+		try
+		{
+			Class.forName("org.h2.Driver");
+			System.out.println("H2 JDBC Driver loaded");
+		}
+		catch (ClassNotFoundException ex) 
+		{
+			System.err.println("Unable to load JDBC Driver");
+			System.exit(-1);
+		}
+	
+		try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD))
+		{	
+
+			try (PreparedStatement lookUp = conn.prepareStatement("SELECT * " +
+																"from lab7_reservations " +
+																"where Code = ?"))
+			{
+				lookUp.setInt(1, Integer.parseInt(userInput[0]));
+				ResultSet lookUpResult = lookUp.executeQuery();
+				if (lookUpResult.next())
+				{
+					System.out.println("Found a record");
+					if (userInput[1].equals("NC"))
+					{
+						userInput[1] = lookUpResult.getString("FirstName");
+					}
+					if (userInput[2].equals("NC"))
+					{
+						userInput[2] = lookUpResult.getString("LastName");
+					}
+					if (userInput[3].equals("NC"))
+					{
+						userInput[3] = lookUpResult.getString("CheckIn");
+					}
+					if (userInput[4].equals("NC"))
+					{
+						userInput[4] = lookUpResult.getString("Checkout");
+					}
+					if (userInput[5].equals("NC"))
+					{
+						userInput[5] = Integer.toString(lookUpResult.getInt("Kids"));
+					}
+					if (userInput[6].equals("NC"))
+					{
+						userInput[6] = Integer.toString(lookUpResult.getInt("Adults"));
+					}
+				}
+			}
+
+			try (PreparedStatement pstmt = conn.prepareStatement("SELECT * " +
+																"from lab7_reservations R1, (select Room from lab7_reservations where Code = ?) as R2 " +
+																"where R1.Room = R2.Room and R1.Code <> ? and (CheckIn <= ? and CheckOut > ?) or (CheckIn < ? and CheckIn > ?)"))
+			{
+				pstmt.setInt(1, Integer.parseInt(userInput[0]));
+				pstmt.setInt(2, Integer.parseInt(userInput[0]));
+				pstmt.setString(3, userInput[3]);
+				pstmt.setString(4, userInput[3]);
+				pstmt.setString(5, userInput[4]);
+				pstmt.setString(6, userInput[3]);
+				ResultSet rs = pstmt.executeQuery();
+				if (rs.next())
+				{
+					System.out.println("There is a conflict");
+				}
+				else
+				{
+					try (PreparedStatement pstmt1 = conn.prepareStatement("UPDATE lab7_reservations "+
+																		"SET FirstName = ?,  LastName = ?, CheckIn = ?, CheckOut = ?, Adults = ?, Kids = ? "+
+																		"WHERE Code = ?"))
+					{
+						pstmt1.setString(1, userInput[1]);
+						pstmt1.setString(2, userInput[2]);
+						pstmt1.setString(3, userInput[3]);
+						pstmt1.setString(4, userInput[4]);
+						pstmt1.setInt(5, Integer.parseInt(userInput[5]));
+						pstmt1.setInt(6, Integer.parseInt(userInput[6]));
+						pstmt1.setInt(7, Integer.parseInt(userInput[0]));
+						pstmt1.executeUpdate();
+					}
+				}
+			}
+		}
+	}
+
 }
 
 
