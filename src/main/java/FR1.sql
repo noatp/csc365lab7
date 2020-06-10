@@ -21,22 +21,22 @@ with list as (
 ), FR1_Today as (
     select distinct ROOMCODE, "Today" as nextAvailableCheckIn, "None" as nextReservation
     from list, lab7_rooms
-    where (mostRecentCheckOut <= CURDATE()) or not exists (
+    where not exists (
         select ROOM 
         from list
-        where ROOMCODE <> ROOM
-    )
+        where ROOMCODE = ROOM
+        ) or (mostRecentCheckOut <= CURDATE())
 ), FR1_CheckIn as (
     select distinct ROOMCODE, mostRecentCheckOut as nextAvailableCheckIn, "None" as NextReservation
     from list, lab7_rooms
-    where mostRecentCheckOut > CURDATE() and roomcode = room
+    where mostRecentCheckOut > CURDATE() and mostRecentCheckIn <= CURDATE() and roomcode = room
 ), FR1_FutureReservation as (
     select distinct ROOMCODE, "Today" as nextAvailableCheckIn, mostRecentCheckIn as NextReservation
     from list, lab7_rooms
     where mostRecentCheckIn > CURDATE() and roomcode = room
 )
 
-select RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor, nextAvailableCheckIn, NextReservation
+select distinct RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor, nextAvailableCheckIn, NextReservation
 from 
 ((select F0.RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor, nextAvailableCheckIn, NextReservation
 from lab7_rooms F0, FR1_Today F1
