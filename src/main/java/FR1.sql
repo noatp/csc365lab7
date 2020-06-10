@@ -15,38 +15,15 @@ select * from lab7_rooms
 select * from lab7_reservations
 --FR1
 
-with list as (
-    SELECT ROOM, MAX(CheckOut) as mostRecentCheckOut, MAX(CheckIn) as mostRecentCheckIn
-	FROM lab7_reservations rs GROUP BY ROOM
-), FR1_Today as (
-    select distinct ROOMCODE, "Today" as nextAvailableCheckIn, "None" as nextReservation
-    from list, lab7_rooms
-    where not exists (
-        select ROOM 
-        from list
-        where ROOMCODE = ROOM
-        ) or (mostRecentCheckOut <= CURDATE())
-), FR1_CheckIn as (
-    select distinct ROOMCODE, mostRecentCheckOut as nextAvailableCheckIn, "None" as NextReservation
-    from list, lab7_rooms
-    where mostRecentCheckOut > CURDATE() and mostRecentCheckIn <= CURDATE() and roomcode = room
-), FR1_FutureReservation as (
-    select distinct ROOMCODE, "Today" as nextAvailableCheckIn, mostRecentCheckIn as NextReservation
-    from list, lab7_rooms
-    where mostRecentCheckIn > CURDATE() and roomcode = room
-)
+--- FR1
+-- Input: roomcode ='HBB', today = CURDATE()
+-- list room that checkIn <= today < checkout
+select Room, CheckIn, Checkout
+from lab7_reservations
+where Room = 'HBB' and CheckIn <= CURDATE() and Checkout > CURDATE()
 
-select distinct RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor, nextAvailableCheckIn, NextReservation
-from 
-((select F0.RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor, nextAvailableCheckIn, NextReservation
-from lab7_rooms F0, FR1_Today F1
-where F0.RoomCode = F1.RoomCode ) 
-union
-(select F0.RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor, nextAvailableCheckIn, NextReservation
-from lab7_rooms F0, FR1_CheckIn F2
-where F0.RoomCode = F2.RoomCode)
-union
-(select F0.RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor, nextAvailableCheckIn, NextReservation
-from lab7_rooms F0,  FR1_FutureReservation F3
-where F0.RoomCode = F3.RoomCode)) as A
-order by RoomCode
+-- Input: checkout day = '2020-06-11', roomcode = 'HBB'
+-- list room that checkIn > checkOut
+select Room, CheckIn, Checkout
+from lab7_reservations
+where Room = 'HBB' and CheckIn > '2020-06-11'
