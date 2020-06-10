@@ -35,6 +35,7 @@ public class InnReservation {
 			{
 				switch(option) {
 					case "FR1":
+						hp.fr1();
 						break;
 					case "FR2":
 						break;
@@ -69,25 +70,10 @@ public class InnReservation {
 								   JDBC_USER,
 								   JDBC_PASSWORD)) {
 			try (Statement stmt = conn.createStatement()) {
-					stmt.execute("DROP TABLE IF EXISTS hp_goods");
-
-					//lab7_reservations
 					stmt.execute("DROP TABLE IF EXISTS lab7_reservations");
-					stmt.execute("CREATE TABLE lab7_reservations(Code INT(11), Room CHAR(5), CheckIn DATE, Checkout DATE, Rate FLOAT, LastName VARCHAR(15), FirstName VARCHAR(15), Adults INT(3), Kids INT(3),PRIMARY KEY (Code))");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10498, 'AOB', '2010-02-02', '2010-02-05', 218.75, 'CARISTO', 'MARKITA', 2, 1)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10990, 'CAS', '2010-09-21', '2010-09-27', 175, 'TRACHSEL', 'DAMIEN', 1, 3)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10574, 'FNA', '2010-11-26', '2010-12-03', 287.5, 'SWEAZY', 'ROY', 2, 1)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10105, 'HBB', '2010-10-23', '2010-10-25', 100, 'SLEBIG', 'CONRAD', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10183, 'IBD', '2010-09-19', '2010-09-20', 150, 'GABLER', 'DOLLIE', 2, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (11996, 'IBS', '2010-09-14', '2010-09-16', 197.5, 'BURBANK', 'ROBERT', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (14273, 'MWC', '2010-05-28', '2010-05-30', 125, 'STARE', 'ELIJAH', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10449, 'RND', '2010-09-30', '2010-10-01', 150, 'KLESS', 'NELSON', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (12142, 'RTE', '2010-08-13', '2010-08-23', 175, 'JUNOR', 'LENNY', 3, 1)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (99999, 'SAY', '2009-12-12', '2011-01-15', 99, 'ARNN', 'KIP', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (83481, 'TAA', '2010-01-03', '2010-01-07', 67.5, 'ENGELSON', 'MIKKI', 2, 0)");
-
 					stmt.execute("DROP TABLE IF EXISTS lab7_rooms");
-					stmt.execute("CREATE TABLE lab7_rooms(RoomCode CHAR(5), RoomName VARCHAR(30), Beds INT(3), BedType VARCHAR(8), MaxOcc INT(3), BasePrice FLOAT, Decor VARCHAR(20))");
+
+					stmt.execute("CREATE TABLE lab7_rooms(RoomCode CHAR(5), RoomName VARCHAR(30), Beds INT(3), BedType VARCHAR(8), MaxOcc INT(3), BasePrice FLOAT, Decor VARCHAR(20), PRIMARY KEY (RoomCode))");
 					stmt.execute("INSERT INTO lab7_rooms (RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor) VALUES ('AOB', 'Abscond or bolster', 2, 'Queen', 4, 175, 'traditional')");
 					stmt.execute("INSERT INTO lab7_rooms (RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor) VALUES ('CAS', 'Convoke and sanguine', 2, 'King', 4, 175, 'traditional')");
 					stmt.execute("INSERT INTO lab7_rooms (RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor) VALUES ('FNA', 'Frugal not apropos', 2, 'King', 4, 250, 'traditional')");
@@ -99,6 +85,26 @@ public class InnReservation {
 					stmt.execute("INSERT INTO lab7_rooms (RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor) VALUES ('RTE', 'Riddle to exculpate', 2, 'Queen', 4, 175, 'rustic')");
 					stmt.execute("INSERT INTO lab7_rooms (RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor) VALUES ('SAY', 'Stay all year (added May 19th)', 1, 'Queen', 3, 100, 'modern')");
 					stmt.execute("INSERT INTO lab7_rooms (RoomCode, RoomName, Beds, BedType, MaxOcc, BasePrice, Decor) VALUES ('TAA', 'Thrift and accolade', 1, 'Double', 2, 75, 'modern')");
+
+					//lab7_reservations
+					stmt.execute("DROP TABLE IF EXISTS lab7_reservations");
+					stmt.execute("CREATE TABLE lab7_reservations(Code INT(11), Room CHAR(5), CheckIn DATE, Checkout DATE, Rate FLOAT, LastName VARCHAR(15), FirstName VARCHAR(15), Adults INT(3), Kids INT(3),PRIMARY KEY (Code), FOREIGN KEY (Room) REFERENCES lab7_rooms(RoomCode))");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10498, 'AOB', '2010-02-02', '2010-02-05', 218.75, 'CARISTO', 'MARKITA', 2, 1)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10990, 'CAS', '2010-09-21', '2010-09-27', 175, 'TRACHSEL', 'DAMIEN', 1, 3)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10574, 'FNA', '2010-11-26', '2010-12-03', 287.5, 'SWEAZY', 'ROY', 2, 1)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10105, 'HBB', '2010-10-23', '2010-10-25', 100, 'SLEBIG', 'CONRAD', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10183, 'IBD', '2010-09-19', '2010-09-20', 150, 'GABLER', 'DOLLIE', 2, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (11996, 'IBS', '2010-09-14', '2010-09-16', 197.5, 'BURBANK', 'ROBERT', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (14273, 'MWC', '2010-05-28', '2010-05-30', 125, 'STARE', 'ELIJAH', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10449, 'RND', '2010-09-30', '2010-10-01', 150, 'KLESS', 'NELSON', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (12142, 'RTE', '2010-08-13', '2010-08-23', 175, 'JUNOR', 'LENNY', 3, 1)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (99999, 'SAY', '2009-12-12', '2011-01-15', 99, 'ARNN', 'KIP', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (83481, 'TAA', '2010-01-03', '2010-01-07', 67.5, 'ENGELSON', 'MIKKI', 2, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10107, 'HBB', '2020-05-01', '2020-06-11', 100, 'SLEBIG', 'CONRAD', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10188, 'AOB', '2020-06-11', '2020-06-13', 150, 'GABLER', 'DOLLIE', 2, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10578, 'FNA', '2020-06-11', '2020-06-13', 150, 'GABLER', 'DOLLIE', 2, 0)");
+
+					
 			}
 		}
 	}
@@ -166,7 +172,104 @@ public class InnReservation {
     }
     
 
-    // // Demo2 - Establish JDBC connection, execute SELECT query, read & print result
+	private void fr1() throws SQLException {
+		String nextAvailableDate = "";
+		String nextStartDate = "";
+		List<String> codes = new ArrayList<String>();
+		try
+		{
+			Class.forName("org.h2.Driver");
+			System.out.println("H2 JDBC Driver loaded");
+		}
+		catch (ClassNotFoundException ex) 
+		{
+			System.err.println("Unable to load JDBC Driver");
+			System.exit(-1);
+		}
+	
+		try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD))
+		{	
+			try (Statement stmt = conn.createStatement()) 
+			{
+				ResultSet rs = stmt.executeQuery("SELECT * FROM lab7_rooms");
+				while (rs.next())
+				{
+					String roomCode = rs.getString("RoomCode");
+					String roomName = rs.getString("RoomName");
+					Integer beds = rs.getInt("Beds");
+					String bedType = rs.getString("BedType");
+					Integer maxOcc = rs.getInt("MaxOcc");
+					Float basePrice = rs.getFloat("BasePrice");
+					String decor = rs.getString("Decor");
+
+					try(Statement stmt1 = conn.createStatement())
+					{
+						ResultSet temp1 = stmt1.executeQuery("select Room, Checkout " +
+														"from lab7_reservations " +
+														"where Room = '" + roomCode +"' and CheckIn <= CURDATE() and Checkout > CURDATE()");
+						if (temp1.next())
+						{
+							//if there is an entry => room is occupied, so the checkout date of the current reservation should be the next available date for checking in.
+							nextAvailableDate = temp1.getString("Checkout");
+							//now look for next start date
+							try(Statement stmt2 = conn.createStatement())
+							{
+								ResultSet temp2 = stmt2.executeQuery("select Room, CheckIn " +
+													"from lab7_reservations " + 
+													"where Room = '" + roomCode + "' and CheckIn > '" + nextAvailableDate + "' " +
+													"order by CheckIn");
+								if (temp2.next())
+								{
+									nextStartDate = temp2.getString("CheckIn");
+								}
+								else
+								{
+									nextStartDate = "None";
+								}
+								temp2.close();
+								stmt2.close();
+							}
+						}
+						else
+						{
+							//if there is no entry => room is not occupied, so the next available date is today
+							nextAvailableDate = "Today";
+							try(Statement stmt2 = conn.createStatement())
+							{
+								ResultSet temp2 = stmt2.executeQuery("select Room, CheckIn " +
+													"from lab7_reservations " + 
+													"where Room = '" + roomCode + "' and CheckIn > CURDATE() " +
+													"order by CheckIn");
+								if (temp2.next())
+								{
+									nextStartDate = temp2.getString("CheckIn");
+								}
+								else
+								{
+									nextStartDate = "None";
+								}
+								temp2.close();
+								stmt2.close();
+							}
+						}
+						temp1.close();
+						stmt1.close();
+					}
+
+					
+					System.out.format("%s, %s, %d, %s, %d, %.2f, %s, %s, %s %n", roomCode, roomName, beds, bedType, maxOcc, basePrice, decor, nextAvailableDate, nextStartDate);
+					
+				}
+			}/////
+		}
+			// Step 6: (omitted in this example) Commit or rollback transaction
+		}
+		// Step 7: Close connection (handled by try-with-resources syntax)
+	}
+
+
+
+    /* // Demo2 - Establish JDBC connection, execute SELECT query, read & print result
     // private void demo2() throws SQLException {
 
 	// // Step 1: Establish connection to RDBMS
@@ -194,10 +297,10 @@ public class InnReservation {
 	//     // Step 6: (omitted in this example) Commit or rollback transaction
 	// }
 	// // Step 7: Close connection (handled by try-with-resources syntax)
-    // }
+    // }*/
 
 
-    // // Demo3 - Establish JDBC connection, execute DML query (UPDATE)
+    /* // // Demo3 - Establish JDBC connection, execute DML query (UPDATE)
     // // -------------------------------------------
     // // Never (ever) write database code like this!
     // // -------------------------------------------
@@ -240,10 +343,10 @@ public class InnReservation {
 
     //     demo2();
         
-    // }
+    // }*/
 
 
-    // // Demo4 - Establish JDBC connection, execute DML query (UPDATE) using PreparedStatement / transaction    
+    /*// // Demo4 - Establish JDBC connection, execute DML query (UPDATE) using PreparedStatement / transaction    
     // private void demo4() throws SQLException {
 
 	// // Step 1: Establish connection to RDBMS
@@ -280,11 +383,11 @@ public class InnReservation {
 
 	// }
 	// // Step 7: Close connection (handled implcitly by try-with-resources syntax)
-    // }
+    // }*/
 
 
 
-    // // Demo5 - Construct a query using PreparedStatement
+    /* // // Demo5 - Construct a query using PreparedStatement
     // private void demo5() throws SQLException {
 
 	// // Step 1: Establish connection to RDBMS
@@ -323,11 +426,5 @@ public class InnReservation {
 	//     }
 
 	// }
-    // }
-
-
-   
-    
-
-}
+    // }*/
 
