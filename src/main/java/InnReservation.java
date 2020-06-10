@@ -1,5 +1,8 @@
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -38,6 +41,7 @@ public class InnReservation {
 						hp.fr1();
 						break;
 					case "FR2":
+						hp.parseReservationInput();
 						break;
 					case "FR3":
 						break;
@@ -172,7 +176,8 @@ public class InnReservation {
     }
     
 
-	private void fr1() throws SQLException {
+	private void fr1() throws SQLException 
+	{
 		String nextAvailableDate = "";
 		String nextStartDate = "";
 		List<String> codes = new ArrayList<String>();
@@ -256,18 +261,44 @@ public class InnReservation {
 						stmt1.close();
 					}
 
-					
 					System.out.format("%s, %s, %d, %s, %d, %.2f, %s, %s, %s %n", roomCode, roomName, beds, bedType, maxOcc, basePrice, decor, nextAvailableDate, nextStartDate);
 					
 				}
 			}/////
 		}
 			// Step 6: (omitted in this example) Commit or rollback transaction
-		}
+	}
 		// Step 7: Close connection (handled by try-with-resources syntax)
+	
+
+	private String[] parseReservationInput()
+	{
+		System.out.println("Please input first name, last name, room code, begin date, end date, number of children and number of adult in a comma separated list");
+		String[] returnResult;
+		try
+		{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			String userInput = reader.readLine();
+			returnResult = userInput.split("[, ?.@]+");
+			for (String string : tokenizedInput) 
+			{
+				System.out.println(string);
+			}
+		}
+		catch (IOException e)
+		{
+			System.err.println("SQLException: " + e.getMessage());
+		}	
+		return returnResult;	
 	}
 
+}
 
+
+	private void fr2() throws SQLException
+	{
+		
+	}
 
     /* // Demo2 - Establish JDBC connection, execute SELECT query, read & print result
     // private void demo2() throws SQLException {
@@ -298,8 +329,6 @@ public class InnReservation {
 	// }
 	// // Step 7: Close connection (handled by try-with-resources syntax)
     // }*/
-
-
     /* // // Demo3 - Establish JDBC connection, execute DML query (UPDATE)
     // // -------------------------------------------
     // // Never (ever) write database code like this!
@@ -344,8 +373,6 @@ public class InnReservation {
     //     demo2();
         
     // }*/
-
-
     /*// // Demo4 - Establish JDBC connection, execute DML query (UPDATE) using PreparedStatement / transaction    
     // private void demo4() throws SQLException {
 
@@ -384,9 +411,6 @@ public class InnReservation {
 	// }
 	// // Step 7: Close connection (handled implcitly by try-with-resources syntax)
     // }*/
-
-
-
     /* // // Demo5 - Construct a query using PreparedStatement
     // private void demo5() throws SQLException {
 
