@@ -41,7 +41,7 @@ public class InnReservation {
 						hp.fr1();
 						break;
 					case "FR2":
-						hp.parseReservationInput();
+						hp.fr2(hp.parseReservationInput());
 						break;
 					case "FR3":
 						break;
@@ -180,7 +180,6 @@ public class InnReservation {
 	{
 		String nextAvailableDate = "";
 		String nextStartDate = "";
-		List<String> codes = new ArrayList<String>();
 		try
 		{
 			Class.forName("org.h2.Driver");
@@ -280,25 +279,75 @@ public class InnReservation {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 			String userInput = reader.readLine();
 			returnResult = userInput.split("[, ?.@]+");
-			for (String string : tokenizedInput) 
+			for (String string : returnResult) 
 			{
 				System.out.println(string);
 			}
+			return returnResult;
 		}
 		catch (IOException e)
 		{
 			System.err.println("SQLException: " + e.getMessage());
 		}	
-		return returnResult;	
+		return null;
 	}
 
+	private void fr2(String[] userInput) throws SQLException
+	{
+		try
+		{
+			Class.forName("org.h2.Driver");
+			System.out.println("H2 JDBC Driver loaded");
+		}
+		catch (ClassNotFoundException ex) 
+		{
+			System.err.println("Unable to load JDBC Driver");
+			System.exit(-1);
+		}
+	
+		try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD))
+		{	
+			try (PreparedStatement pstmt = conn.prepareStatement("SELECT * " +
+																"FROM lab7_reservations " +
+																"where Room = ? and (CheckIn <= ? and CheckOut > ?) or (CheckIn < ? and CheckIn > ?)"))
+			{
+				pstmt.setString(1, userInput[2]);
+				pstmt.setString(2, userInput[3]);
+				pstmt.setString(3, userInput[3]);
+				pstmt.setString(4, userInput[4]);
+				pstmt.setString(5, userInput[3]);
+				ResultSet rs = pstmt.executeQuery();
+				if (rs.next())
+				{
+					System.out.println("There is a conflict");
+				}
+				else
+				{
+					try (PreparedStatement pstmt1 = conn.prepareStatement("SELECT * "+
+																		"from lab7_rooms " +
+																		" where RoomCode = ? and MaxOcc >= ?"))
+					{
+						pstmt1.setString(1, userInput[2]);
+						pstmt1.setInt(2, Integer.parseInt(userInput[5]) + Integer.parseInt(userInput[6]));
+						ResultSet rs1 = pstmt1.executeQuery();
+						if (rs1.next())
+						{
+							System.out.println("add row");
+						}
+						else
+						{
+							System.out.println("no room with maxOcc enough for this");
+						}
+					}
+				}
+			}
+
+		}
+	}
 }
 
 
-	private void fr2() throws SQLException
-	{
-		
-	}
+	
 
     /* // Demo2 - Establish JDBC connection, execute SELECT query, read & print result
     // private void demo2() throws SQLException {
