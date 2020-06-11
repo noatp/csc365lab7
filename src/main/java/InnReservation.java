@@ -352,7 +352,7 @@ public class InnReservation {
 		{	
 			try (PreparedStatement pstmt = conn.prepareStatement("SELECT * " +
 																"FROM lab7_reservations " +
-																"where Room = ? and (CheckIn <= ? and CheckOut > ?) or (CheckIn < ? and CheckIn > ?)"))
+																"where Room = ? and ((CheckIn <= ? and CheckOut > ?) or (CheckIn < ? and CheckIn > ?))"))
 			{
 				pstmt.setString(1, userInput[2]);
 				pstmt.setString(2, userInput[3]);
@@ -449,7 +449,7 @@ public class InnReservation {
 
 			try (PreparedStatement pstmt = conn.prepareStatement("SELECT * " +
 																"from lab7_reservations R1, (select Room from lab7_reservations where Code = ?) as R2 " +
-																"where R1.Room = R2.Room and R1.Code <> ? and (CheckIn <= ? and CheckOut > ?) or (CheckIn < ? and CheckIn > ?)"))
+																"where R1.Room = R2.Room and R1.Code <> ? and ((CheckIn <= ? and CheckOut > ?) or (CheckIn < ? and CheckIn > ?))"))
 			{
 				pstmt.setInt(1, Integer.parseInt(userInput[0]));
 				pstmt.setInt(2, Integer.parseInt(userInput[0]));
@@ -460,8 +460,6 @@ public class InnReservation {
 				ResultSet rs = pstmt.executeQuery();
 				if (rs.next())
 				{
-					//try input the same data in 10107
-					System.out.println(rs.getString("Code"));
 					System.out.println("Sorry, there is a conflict with another reservation in the system.");
 				}
 				else
