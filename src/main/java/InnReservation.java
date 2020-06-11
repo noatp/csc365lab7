@@ -42,12 +42,10 @@ public class InnReservation {
 						hp.fr1();
 						break;
 					case "FR2":
-						System.out.println("Please input first name, last name, room code, begin date, end date, number of children and number of adult in a comma separated list");
-						hp.fr2(hp.parseReservationInput());
+						hp.fr2(hp.FR2ReservationInput());
 						break;
 					case "FR3":
-						System.out.println("Please input reservation code, first name, last name, begin date, end date, number of children and number of adult in a comma separated list, OR ENTER NC IF NO CHANGE IS NEEDED");
-						hp.fr3(hp.parseReservationInput());
+						hp.fr3(hp.FR3ReservationInput());
 						break;
 					case "FR4":
 						break;
@@ -57,9 +55,9 @@ public class InnReservation {
 						System.exit(0);
 					default:
 						System.out.println("Error: Command not found");
-						printOption();
 						break;
 				}
+				printOption();
 			}
 
 		} catch (SQLException e) {
@@ -274,19 +272,29 @@ public class InnReservation {
 		// Step 7: Close connection (handled by try-with-resources syntax)
 	
 
-	private String[] parseReservationInput()
+	private String[] FR2ReservationInput()
 	{
-		String[] returnResult;
 		try
 		{
+			String[] stringArray = new String[7];
+			System.out.println("Please input these information:");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-			String userInput = reader.readLine();
-			returnResult = userInput.split("[, ?.@]+");
-			for (String string : returnResult) 
-			{
-				System.out.println(string);
-			}
-			return returnResult;
+			System.out.print("First name: ");
+			stringArray[0] = reader.readLine();  // Read user input
+			System.out.print("Last name: ");
+			stringArray[1] = reader.readLine();
+			System.out.print("Room code: ");
+			stringArray[2] = reader.readLine();
+			System.out.print("Begin date (YYYY-MM-DD): ");
+			stringArray[3] = reader.readLine();
+			System.out.print("End date (YYYY-MM-DD): ");
+			stringArray[4] = reader.readLine();
+			System.out.print("Number of children: ");
+			stringArray[5] = reader.readLine();
+			System.out.print("Number of adult: ");
+			stringArray[6] = reader.readLine();
+			System.out.println(stringArray);
+			return stringArray;
 		}
 		catch (IOException e)
 		{
@@ -294,6 +302,38 @@ public class InnReservation {
 		}	
 		return null;
 	}
+
+	private String[] FR3ReservationInput()
+	{
+		try
+		{
+			String[] stringArray = new String[7];
+			System.out.println("Please input these information, enter NC if no change is needed:");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			System.out.print("Reservation code: ");
+			stringArray[0] = reader.readLine();  // Read user input
+			System.out.print("First name: ");
+			stringArray[1] = reader.readLine();
+			System.out.print("Last name: ");
+			stringArray[2] = reader.readLine();
+			System.out.print("Begin date (YYYY-MM-DD): ");
+			stringArray[3] = reader.readLine();
+			System.out.print("End date (YYYY-MM-DD): ");
+			stringArray[4] = reader.readLine();
+			System.out.print("Number of children: ");
+			stringArray[5] = reader.readLine();
+			System.out.print("Number of adult: ");
+			stringArray[6] = reader.readLine();
+			System.out.println(stringArray);
+			return stringArray;
+		}
+		catch (IOException e)
+		{
+			System.err.println("SQLException: " + e.getMessage());
+		}	
+		return null;
+	}
+
 
 	private void fr2(String[] userInput) throws SQLException
 	{
@@ -322,7 +362,7 @@ public class InnReservation {
 				ResultSet rs = pstmt.executeQuery();
 				if (rs.next())
 				{
-					System.out.println("There is a conflict");
+					System.out.println("Sorry, there is a conflict with another reservation in the system.");
 				}
 				else
 				{
@@ -335,11 +375,11 @@ public class InnReservation {
 						ResultSet rs1 = pstmt1.executeQuery();
 						if (rs1.next())
 						{
-							System.out.println("add row");
+							System.out.println("New reservation has been added.");
 						}
 						else
 						{
-							System.out.println("no room with maxOcc enough for this");
+							System.out.println("Sorry, the requested person count exceeds the maximum capacity of the selected room.");
 						}
 					}
 				}
@@ -350,6 +390,7 @@ public class InnReservation {
 
 	private void fr3(String[] userInput) throws SQLException
 	{
+		String Room = "";
 		try
 		{
 			Class.forName("org.h2.Driver");
@@ -397,6 +438,12 @@ public class InnReservation {
 					{
 						userInput[6] = Integer.toString(lookUpResult.getInt("Adults"));
 					}
+					Room = lookUpResult.getString("Room");
+					System.out.println(Room);
+				}
+				else {
+					System.out.println("There is no record found.");
+					return;
 				}
 			}
 
@@ -413,23 +460,42 @@ public class InnReservation {
 				ResultSet rs = pstmt.executeQuery();
 				if (rs.next())
 				{
-					System.out.println("There is a conflict");
+					//try input the same data in 10107
+					System.out.println(rs.getString("Code"));
+					System.out.println("Sorry, there is a conflict with another reservation in the system.");
 				}
 				else
 				{
-					try (PreparedStatement pstmt1 = conn.prepareStatement("UPDATE lab7_reservations "+
-																		"SET FirstName = ?,  LastName = ?, CheckIn = ?, CheckOut = ?, Adults = ?, Kids = ? "+
-																		"WHERE Code = ?"))
+					try (PreparedStatement pstmt3 = conn.prepareStatement("SELECT * "+
+																		"from lab7_rooms " +
+																		" where RoomCode = ? and MaxOcc >= ?"))
 					{
-						pstmt1.setString(1, userInput[1]);
-						pstmt1.setString(2, userInput[2]);
-						pstmt1.setString(3, userInput[3]);
-						pstmt1.setString(4, userInput[4]);
-						pstmt1.setInt(5, Integer.parseInt(userInput[5]));
-						pstmt1.setInt(6, Integer.parseInt(userInput[6]));
-						pstmt1.setInt(7, Integer.parseInt(userInput[0]));
-						pstmt1.executeUpdate();
+						pstmt3.setString(1, Room);
+						pstmt3.setInt(2, Integer.parseInt(userInput[5]) + Integer.parseInt(userInput[6]));
+						ResultSet rs1 = pstmt3.executeQuery();
+						if (rs1.next())
+						{
+							//update	
+							try (PreparedStatement pstmt1 = conn.prepareStatement("UPDATE lab7_reservations "+
+												"SET FirstName = ?,  LastName = ?, CheckIn = ?, CheckOut = ?, Adults = ?, Kids = ? "+"WHERE Code = ?"))
+							{
+								pstmt1.setString(1, userInput[1]);
+								pstmt1.setString(2, userInput[2]);
+								pstmt1.setString(3, userInput[3]);
+								pstmt1.setString(4, userInput[4]);
+								pstmt1.setInt(5, Integer.parseInt(userInput[5]));
+								pstmt1.setInt(6, Integer.parseInt(userInput[6]));
+								pstmt1.setInt(7, Integer.parseInt(userInput[0]));
+								pstmt1.executeUpdate();
+								System.out.println("The reservation has been updated");
+							}
+						}
+						else
+						{
+							System.out.println("Sorry, the requested person count exceeds the maximum capacity of the selected room.");
+						}
 					}
+					
 				}
 			}
 		}
