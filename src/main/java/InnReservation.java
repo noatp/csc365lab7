@@ -26,7 +26,8 @@ public class InnReservation {
 
     private final String JDBC_URL = "jdbc:h2:~/csc365_lab7";
     private final String JDBC_USER = "";
-    private final String JDBC_PASSWORD = "";
+	private final String JDBC_PASSWORD = "";
+	private int nextAvailableReservationCode = 10015;
     
     public static void main(String[] args) {
 		try {
@@ -38,6 +39,9 @@ public class InnReservation {
 			while(!(option = new Scanner(System.in).next()).equals("Q"))
 			{
 				switch(option) {
+					case "demo":
+						hp.demo1();
+						break;
 					case "FR1":
 						hp.fr1();
 						break;
@@ -48,6 +52,7 @@ public class InnReservation {
 						hp.fr3(hp.FR3ReservationInput());
 						break;
 					case "FR4":
+						hp.fr4(hp.FR4ReservationInput());
 						break;
 					case "FR5":
 						break;
@@ -95,20 +100,20 @@ public class InnReservation {
 					//lab7_reservations
 					stmt.execute("DROP TABLE IF EXISTS lab7_reservations");
 					stmt.execute("CREATE TABLE lab7_reservations(Code INT(11), Room CHAR(5), CheckIn DATE, Checkout DATE, Rate FLOAT, LastName VARCHAR(15), FirstName VARCHAR(15), Adults INT(3), Kids INT(3),PRIMARY KEY (Code), FOREIGN KEY (Room) REFERENCES lab7_rooms(RoomCode))");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10498, 'AOB', '2020-02-02', '2020-02-05', 218.75, 'CARISTO', 'MARKITA', 2, 1)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10990, 'CAS', '2020-09-21', '2020-09-27', 175, 'TRACHSEL', 'DAMIEN', 1, 3)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10574, 'FNA', '2020-11-26', '2020-12-03', 287.5, 'SWEAZY', 'ROY', 2, 1)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10105, 'HBB', '2020-10-23', '2020-10-25', 100, 'SLEBIG', 'CONRAD', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10183, 'IBD', '2020-09-19', '2020-09-20', 150, 'GABLER', 'DOLLIE', 2, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (11996, 'IBS', '2020-09-14', '2020-09-16', 197.5, 'BURBANK', 'ROBERT', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (14273, 'MWC', '2020-05-28', '2020-05-30', 125, 'STARE', 'ELIJAH', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10449, 'RND', '2020-09-30', '2020-10-01', 150, 'KLESS', 'NELSON', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (12142, 'RTE', '2020-08-13', '2020-08-23', 175, 'JUNOR', 'LENNY', 3, 1)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (99999, 'SAY', '2020-12-12', '2020-01-15', 99, 'ARNN', 'KIP', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (83481, 'TAA', '2020-01-03', '2020-01-07', 67.5, 'ENGELSON', 'MIKKI', 2, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10107, 'HBB', '2020-05-01', '2020-06-11', 100, 'SLEBIG', 'CONRAD', 1, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10188, 'AOB', '2020-06-11', '2020-06-13', 150, 'GABLER', 'DOLLIE', 2, 0)");
-					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10578, 'FNA', '2020-06-11', '2020-06-13', 150, 'GABLER', 'DOLLIE', 2, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10001, 'AOB', '2020-02-02', '2020-02-05', 218.75, 'CARISTO', 'MARKITA', 2, 1)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10002, 'CAS', '2020-09-21', '2020-09-27', 175, 'TRACHSEL', 'DAMIEN', 1, 3)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10003, 'FNA', '2020-11-26', '2020-12-03', 287.5, 'SWEAZY', 'ROY', 2, 1)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10004, 'HBB', '2020-10-23', '2020-10-25', 100, 'SLEBIG', 'CONRAD', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10005, 'IBD', '2020-09-19', '2020-09-20', 150, 'GABLER', 'DOLLIE', 2, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10006, 'IBS', '2020-09-14', '2020-09-16', 197.5, 'BURBANK', 'ROBERT', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10007, 'MWC', '2020-05-28', '2020-05-30', 125, 'STARE', 'ELIJAH', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10008, 'RND', '2020-09-30', '2020-10-01', 150, 'KLESS', 'NELSON', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10009, 'RTE', '2020-08-13', '2020-08-23', 175, 'JUNOR', 'LENNY', 3, 1)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10010, 'SAY', '2020-12-12', '2020-01-15', 99, 'ARNN', 'KIP', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10011, 'TAA', '2020-01-03', '2020-01-07', 67.5, 'ENGELSON', 'MIKKI', 2, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10012, 'HBB', '2020-05-01', '2020-06-11', 100, 'SLEBIG', 'CONRAD', 1, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10013, 'AOB', '2020-06-11', '2020-06-13', 150, 'GABLER', 'DOLLIE', 2, 0)");
+					stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (10014, 'FNA', '2020-06-11', '2020-06-13', 150, 'GABLER', 'DOLLIE', 2, 0)");
 
 					
 			}
@@ -263,13 +268,13 @@ public class InnReservation {
 					}
 
 					System.out.format("%s, %s, %d, %s, %d, %.2f, %s, %s, %s %n", roomCode, roomName, beds, bedType, maxOcc, basePrice, decor, nextAvailableDate, nextStartDate);
-					
 				}
-			}/////
+				rs.close();
+				stmt.close();
+			}
+			conn.close();
 		}
-			// Step 6: (omitted in this example) Commit or rollback transaction
 	}
-		// Step 7: Close connection (handled by try-with-resources syntax)
 	
 
 	private String[] FR2ReservationInput()
@@ -293,7 +298,7 @@ public class InnReservation {
 			stringArray[5] = reader.readLine();
 			System.out.print("Number of adult: ");
 			stringArray[6] = reader.readLine();
-			System.out.println(stringArray);
+			//System.out.println(stringArray);
 			return stringArray;
 		}
 		catch (IOException e)
@@ -324,7 +329,7 @@ public class InnReservation {
 			stringArray[5] = reader.readLine();
 			System.out.print("Number of adult: ");
 			stringArray[6] = reader.readLine();
-			System.out.println(stringArray);
+			//System.out.println(stringArray);
 			return stringArray;
 		}
 		catch (IOException e)
@@ -334,6 +339,24 @@ public class InnReservation {
 		return null;
 	}
 
+	private String FR4ReservationInput()
+	{
+		try
+		{
+			String reservationCode = "";
+			System.out.println("Please input these information:");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			System.out.print("Reservation code: ");
+			reservationCode = reader.readLine();  // Read user input
+			
+			return reservationCode;
+		}
+		catch (IOException e)
+		{
+			System.err.println("SQLException: " + e.getMessage());
+		}	
+		return null;
+	}
 
 	private void fr2(String[] userInput) throws SQLException
 	{
@@ -376,15 +399,31 @@ public class InnReservation {
 						if (rs1.next())
 						{
 							System.out.println("New reservation has been added.");
+							try (Statement stmt = conn.createStatement()) {
+								stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES ("
+											+ Integer.toString(nextAvailableReservationCode) + ", '" 
+											+ userInput[2] + "', '"
+											+ userInput[3] + "', '"
+											+ userInput[4] + "', 218.75, '"
+											+ userInput[1] + "', '"
+											+ userInput[0] + "', "
+											+ userInput[6] + ", "
+											+ userInput[5] + ")");
+								stmt.close();			
+							}
 						}
 						else
 						{
 							System.out.println("Sorry, the requested person count exceeds the maximum capacity of the selected room.");
 						}
+						rs1.close();
+						pstmt1.close();
 					}
 				}
+				rs.close();
+				pstmt.close();
 			}
-
+			conn.close();
 		}
 	}
 
@@ -439,12 +478,15 @@ public class InnReservation {
 						userInput[6] = Integer.toString(lookUpResult.getInt("Adults"));
 					}
 					Room = lookUpResult.getString("Room");
-					System.out.println(Room);
+					System.out.println("This is user input reservation code: " + userInput[0]);
+					System.out.println("Which is of this room: " + Room);
 				}
 				else {
 					System.out.println("There is no record found.");
 					return;
 				}
+				lookUpResult.close();
+				lookUp.close();
 			}
 
 			try (PreparedStatement pstmt = conn.prepareStatement("SELECT * " +
@@ -499,160 +541,97 @@ public class InnReservation {
 		}
 	}
 
-}
 
-
+	private void fr4(String userInput) throws SQLException
+	{
+		try
+		{
+			Class.forName("org.h2.Driver");
+			System.out.println("H2 JDBC Driver loaded");
+		}
+		catch (ClassNotFoundException ex) 
+		{
+			System.err.println("Unable to load JDBC Driver");
+			System.exit(-1);
+		}
 	
+		try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD))
+		{	
 
-    /* // Demo2 - Establish JDBC connection, execute SELECT query, read & print result
-    // private void demo2() throws SQLException {
+			try (PreparedStatement lookUp = conn.prepareStatement("SELECT * " +
+																"from lab7_reservations " +
+																"where Code = ?"))
+			{
+				lookUp.setInt(1, Integer.parseInt(userInput));
+				ResultSet lookUpResult = lookUp.executeQuery();
+				if (lookUpResult.next())
+				{
+					try (Statement stmt = conn.createStatement()) {
+						System.out.println("Remove entry");
+						stmt.execute("delete from lab7_reservations where Code = '" + userInput + "'");
+						stmt.close();
+					}
+				}
+				else
+				{
+					System.out.println("Could not find this reservation code");
+				}
+				lookUpResult.close();
+				lookUp.close();
+			}
+			conn.close();
+		}
+	}
 
-	// // Step 1: Establish connection to RDBMS
-	// try (Connection conn = DriverManager.getConnection(JDBC_URL,
-	// 						   JDBC_USER,
-	// 						   JDBC_PASSWORD)) {
-	//     // Step 2: Construct SQL statement
-	//     String sql = "SELECT * FROM hp_goods";
+	private void fr5() throws SQLException 
+	{
+		try
+		{
+			Class.forName("org.h2.Driver");
+			System.out.println("H2 JDBC Driver loaded");
+		}
+		catch (ClassNotFoundException ex) 
+		{
+			System.err.println("Unable to load JDBC Driver");
+			System.exit(-1);
+		}
 
-	//     // Step 3: (omitted in this example) Start transaction
-
-	//     // Step 4: Send SQL statement to DBMS
-	//     try (Statement stmt = conn.createStatement();
-	// 	 ResultSet rs = stmt.executeQuery(sql)) {
-
-	// 	// Step 5: Receive results
-	// 	while (rs.next()) {
-	// 	    String flavor = rs.getString("Flavor");
-	// 	    String food = rs.getString("Food");
-	// 	    float price = rs.getFloat("Price");
-	// 	    System.out.format("%s %s ($%.2f) %n", flavor, food, price);
-	// 	}
-	//     }
-
-	//     // Step 6: (omitted in this example) Commit or rollback transaction
-	// }
-	// // Step 7: Close connection (handled by try-with-resources syntax)
-    // }*/
-    /* // // Demo3 - Establish JDBC connection, execute DML query (UPDATE)
-    // // -------------------------------------------
-    // // Never (ever) write database code like this!
-    // // -------------------------------------------
-    // private void demo3() throws SQLException {
-
-    //     demo2();
-        
-	// // Step 1: Establish connection to RDBMS
-	// try (Connection conn = DriverManager.getConnection(JDBC_URL,
-	// 						   JDBC_USER,
-	// 						   JDBC_PASSWORD)) {
-	//     // Step 2: Construct SQL statement
-	//     Scanner scanner = new Scanner(System.in);
-	//     System.out.print("Enter a flavor: ");
-	//     String flavor = scanner.nextLine();
-	//     System.out.format("Until what date will %s be available (YYYY-MM-DD)? ", flavor);
-	//     String availUntilDate = scanner.nextLine();
-
-	//     // -------------------------------------------
-	//     // Never (ever) write database code like this!
-	//     // -------------------------------------------
-	//     String updateSql = "UPDATE hp_goods SET AvailUntil = '" + availUntilDate + "' " +
-	// 	               "WHERE Flavor = '" + flavor + "'";
-
-	//     // Step 3: (omitted in this example) Start transaction
-	    
-	//     try (Statement stmt = conn.createStatement()) {
-		
-	// 	// Step 4: Send SQL statement to DBMS
-	// 	int rowCount = stmt.executeUpdate(updateSql);
-		
-	// 	// Step 5: Handle results
-	// 	System.out.format("Updated %d records for %s pastries%n", rowCount, flavor);		
-	//     }
-
-	//     // Step 6: (omitted in this example) Commit or rollback transaction
-	    
-	// }
-	// // Step 7: Close connection (handled implcitly by try-with-resources syntax)
-
-    //     demo2();
-        
-    // }*/
-    /*// // Demo4 - Establish JDBC connection, execute DML query (UPDATE) using PreparedStatement / transaction    
-    // private void demo4() throws SQLException {
-
-	// // Step 1: Establish connection to RDBMS
-	// try (Connection conn = DriverManager.getConnection(JDBC_URL,
-	// 						   JDBC_USER,
-	// 						   JDBC_PASSWORD)) {
-	//     // Step 2: Construct SQL statement
-	//     Scanner scanner = new Scanner(System.in);
-	//     System.out.print("Enter a flavor: ");
-	//     String flavor = scanner.nextLine();
-	//     System.out.format("Until what date will %s be available (YYYY-MM-DD)? ", flavor);
-	//     LocalDate availDt = LocalDate.parse(scanner.nextLine());
-	    
-	//     String updateSql = "UPDATE hp_goods SET AvailUntil = ? WHERE Flavor = ?";
-
-	//     // Step 3: Start transaction
-	//     conn.setAutoCommit(false);
-	    
-	//     try (PreparedStatement pstmt = conn.prepareStatement(updateSql)) {
-		
-	// 	// Step 4: Send SQL statement to DBMS
-	// 	pstmt.setDate(1, java.sql.Date.valueOf(availDt));
-	// 	pstmt.setString(2, flavor);
-	// 	int rowCount = pstmt.executeUpdate();
-		
-	// 	// Step 5: Handle results
-	// 	System.out.format("Updated %d records for %s pastries%n", rowCount, flavor);
-
-	// 	// Step 6: Commit or rollback transaction
-	// 	conn.commit();
-	//     } catch (SQLException e) {
-	// 	conn.rollback();
-	//     }
-
-	// }
-	// // Step 7: Close connection (handled implcitly by try-with-resources syntax)
-    // }*/
-    /* // // Demo5 - Construct a query using PreparedStatement
-    // private void demo5() throws SQLException {
-
-	// // Step 1: Establish connection to RDBMS
-	// try (Connection conn = DriverManager.getConnection(JDBC_URL,
-	// 						   JDBC_USER,
-	// 						   JDBC_PASSWORD)) {
-	//     Scanner scanner = new Scanner(System.in);
-	//     System.out.print("Find pastries with price <=: ");
-	//     Double price = Double.valueOf(scanner.nextLine());
-	//     System.out.print("Filter by flavor (or 'Any'): ");
-	//     String flavor = scanner.nextLine();
-
-	//     List<Object> params = new ArrayList<Object>();
-	//     params.add(price);
-	//     StringBuilder sb = new StringBuilder("SELECT * FROM hp_goods WHERE price <= ?");
-	//     if (!"any".equalsIgnoreCase(flavor)) {
-	// 	sb.append(" AND Flavor = ?");
-	// 	params.add(flavor);
-	//     }
-	    
-	//     try (PreparedStatement pstmt = conn.prepareStatement(sb.toString())) {
-	// 	int i = 1;
-	// 	for (Object p : params) {
-	// 	    pstmt.setObject(i++, p);
-	// 	}
-
-	// 	try (ResultSet rs = pstmt.executeQuery()) {
-	// 	    System.out.println("Matching Pastries:");
-	// 	    int matchCount = 0;
-	// 	    while (rs.next()) {
-	// 		System.out.format("%s %s ($%.2f) %n", rs.getString("Flavor"), rs.getString("Food"), rs.getDouble("price"));
-	// 		matchCount++;
-	// 	    }
-	// 	    System.out.format("----------------------%nFound %d match%s %n", matchCount, matchCount == 1 ? "" : "es");
-	// 	}
-	//     }
-
-	// }
-    // }*/
+		String sql = "with sameMonth as (select Room, Monthname(CheckIn) as month, Month(Checkin) as Monthorder, sum(rate*(datediff(checkout, checkin))) as revenue" +
+					"from lab7_reservations" +
+					"where Monthname(CheckIn) = Monthname(Checkout)" +
+					"group by Room, month, Monthorder" +
+					"order by Room)," +
+					"listDifferentMonth as (select * from lab7_reservations where Monthname(CheckIn) <> Monthname(Checkout))," +
+					"combine as(" +
+						"(select Room, Monthname(CheckIn) as month, Month(Checkin) as Monthorder, sum(rate*(datediff(last_day(checkin), checkin)+1)) as revenue" +
+						"from listDifferentMonth" +
+						"group by Room, month, Monthorder)" +
+						"union" +
+						"(select Room, Monthname(Checkout) as month, Month(Checkout) as Monthorder, sum(rate*(datediff(checkout, date_add(checkout, INTERVAL(1 - DAYOFMonth(checkout)) day))+1)) as revenue" +
+						"from listDifferentMonth" +
+						"group by Room, month, Monthorder)" +
+						"union" +
+						"(select * from sameMonth))" +
+					"select Room, Roomname, month, sum(revenue)" +
+					"from combine C, lab7_rooms R" +
+					"where C.Room = R.RoomCode" +
+					"group by Room, Roomname, month, Monthorder" +
+					"order by Room, Roomname, Monthorder";
+	
+		try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD))
+		{	
+			try (Statement stmt = conn.createStatement()) 
+			{
+				ResultSet rs = stmt.executeQuery(sql);
+				while (rs.next())
+				{
+					//do something
+				}
+				rs.close();
+				stmt.close();
+			}
+			conn.close();
+		}
+	}
+}
 
