@@ -343,10 +343,14 @@ public class InnReservation {
 			}
 			LocalDate begin = LocalDate.parse(stringArray[3]);
 			LocalDate end = LocalDate.parse(stringArray[4]);
-			while (end.compareTo(begin) < 0){
+			while (end.compareTo(begin) <= 0){
 				System.out.println("End date should be greater than begin date");
 				System.out.print("End date (YYYY-MM-DD): ");
 				stringArray[4] = reader.readLine();
+				while (!checkDateFormat(stringArray[4])) {
+					System.out.print("End date (YYYY-MM-DD): ");
+					stringArray[4] = reader.readLine();
+				}
 				end = LocalDate.parse(stringArray[4]);
 			}
 			System.out.print("Number of children: ");
@@ -390,10 +394,14 @@ public class InnReservation {
 			}
 			LocalDate begin = LocalDate.parse(stringArray[3]);
 			LocalDate end = LocalDate.parse(stringArray[4]);
-			while (end.compareTo(begin) < 0){
+			while (end.compareTo(begin) <= 0){
 				System.out.println("End date should be greater than begin date");
 				System.out.print("End date (YYYY-MM-DD): ");
 				stringArray[4] = reader.readLine();
+				while (!checkDateFormat(stringArray[4])) {
+					System.out.print("End date (YYYY-MM-DD): ");
+					stringArray[4] = reader.readLine();
+				}
 				end = LocalDate.parse(stringArray[4]);
 			}
 			System.out.print("Number of children: ");
@@ -555,7 +563,6 @@ public class InnReservation {
 				if (lookUpResult.next())
 				{
 					System.out.println("Found a record");
-					Room = lookUpResult.getString("Room");
 					if (userInput[1].equals("NC"))
 					{
 						userInput[1] = lookUpResult.getString("FirstName");
