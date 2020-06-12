@@ -1,23 +1,48 @@
+// import java.sql.ResultSet;
+// import java.sql.Statement;
+// import java.text.ParseException;
+// import java.text.SimpleDateFormat;
+// import java.io.BufferedReader;
+// import java.io.IOException;
+// import java.io.InputStreamReader;
+// import java.sql.Connection;
+// import java.sql.Date;
+// import java.sql.SQLException;
+// import java.sql.DriverManager;
+// import java.sql.PreparedStatement;
+
+// import java.util.Map;
+// import java.util.Scanner;
+
+// import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
+
+// import java.util.LinkedHashMap;
+// import java.time.LocalDate;
+// import java.util.List;
+// import java.util.ArrayList;
+// import java.util.Calendar;
+
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.Date;
 
 import java.util.Map;
 import java.util.Scanner;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
-
 import java.util.LinkedHashMap;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+
+
 
 /*
 Introductory JDBC examples based loosely on the BAKERY dataset from CSC 365 labs.
@@ -55,6 +80,7 @@ public class InnReservation {
 						hp.fr4(hp.FR4ReservationInput());
 						break;
 					case "FR5":
+						hp.fr5();
 						break;
 					case "Q":
 						System.exit(0);
@@ -398,19 +424,50 @@ public class InnReservation {
 						ResultSet rs1 = pstmt1.executeQuery();
 						if (rs1.next())
 						{
-							System.out.println("New reservation has been added.");
+							float basePrice = rs1.getFloat("BasePrice");
+							String roomName = rs1.getString("RoomName");
+							String bedType = rs1.getString("BedType");
+							
 							try (Statement stmt = conn.createStatement()) {
 								stmt.execute("INSERT INTO lab7_reservations (Code, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES ("
 											+ Integer.toString(nextAvailableReservationCode) + ", '" 
 											+ userInput[2] + "', '"
 											+ userInput[3] + "', '"
-											+ userInput[4] + "', 218.75, '"
+											+ userInput[4] + "', "
+											+ String.valueOf(basePrice) + ", '"
 											+ userInput[1] + "', '"
 											+ userInput[0] + "', "
 											+ userInput[6] + ", "
 											+ userInput[5] + ")");
-								stmt.close();			
+								stmt.close();
+								nextAvailableReservationCode++;		
 							}
+
+						
+							LocalDate begin = LocalDate.parse(userInput[3]);
+							LocalDate end = LocalDate.parse(userInput[4]);
+							float total = 0;
+
+							for (LocalDate date = begin; date.isBefore(end); date = date.plusDays(1))
+							{
+								if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY)
+								{
+									total += 1.1 * basePrice;
+								}
+								else
+								{
+									total += basePrice;
+								}
+							}
+							System.out.println("Here is your confirmation and total cost");
+							System.out.println("Name: " + userInput[0] + " " + userInput[1]);
+							System.out.println("Room info: Room code - " + userInput[2] + ", Room name - " + roomName + ", Bed type - " + bedType);
+							System.out.println("Begin date: " + userInput[3] + ", end date: " + userInput[4]);
+							System.out.println("Number of adults: " + userInput[6]);
+							System.out.println("Number of children: " + userInput[5]);
+							System.out.println("Total cose: " + total);
+
+							
 						}
 						else
 						{
@@ -477,9 +534,6 @@ public class InnReservation {
 					{
 						userInput[6] = Integer.toString(lookUpResult.getInt("Adults"));
 					}
-					Room = lookUpResult.getString("Room");
-					System.out.println("This is user input reservation code: " + userInput[0]);
-					System.out.println("Which is of this room: " + Room);
 				}
 				else {
 					System.out.println("There is no record found.");
@@ -596,39 +650,52 @@ public class InnReservation {
 			System.exit(-1);
 		}
 
-		String sql = "with sameMonth as (select Room, Monthname(CheckIn) as month, Month(Checkin) as Monthorder, sum(rate*(datediff(checkout, checkin))) as revenue" +
-					"from lab7_reservations" +
-					"where Monthname(CheckIn) = Monthname(Checkout)" +
-					"group by Room, month, Monthorder" +
-					"order by Room)," +
-					"listDifferentMonth as (select * from lab7_reservations where Monthname(CheckIn) <> Monthname(Checkout))," +
-					"combine as(" +
-						"(select Room, Monthname(CheckIn) as month, Month(Checkin) as Monthorder, sum(rate*(datediff(last_day(checkin), checkin)+1)) as revenue" +
-						"from listDifferentMonth" +
-						"group by Room, month, Monthorder)" +
-						"union" +
-						"(select Room, Monthname(Checkout) as month, Month(Checkout) as Monthorder, sum(rate*(datediff(checkout, date_add(checkout, INTERVAL(1 - DAYOFMonth(checkout)) day))+1)) as revenue" +
-						"from listDifferentMonth" +
-						"group by Room, month, Monthorder)" +
-						"union" +
-						"(select * from sameMonth))" +
-					"select Room, Roomname, month, sum(revenue)" +
-					"from combine C, lab7_rooms R" +
-					"where C.Room = R.RoomCode" +
-					"group by Room, Roomname, month, Monthorder" +
-					"order by Room, Roomname, Monthorder";
-	
 		try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD))
 		{	
 			try (Statement stmt = conn.createStatement()) 
 			{
-				ResultSet rs = stmt.executeQuery(sql);
+				List<String> roomCodes = new ArrayList<String>();
+				ResultSet rs = stmt.executeQuery("select * from lab7_rooms");
 				while (rs.next())
 				{
-					//do something
-				}
+					roomCodes.add(rs.getString("RoomCode"));
+				}	
 				rs.close();
-				stmt.close();
+
+				for (int i = 0; i < roomCodes.size(); i++)
+				{
+					float yearlySum = 0;
+					System.out.format("%-10s", roomCodes.get(i));
+					for (int j = 1; j <= 12; j++)
+					{
+						ResultSet rs1 = stmt.executeQuery("select sum(Rate) as rev from lab7_reservations where Room = '"
+															+ roomCodes.get(i) + "' and MONTH(Checkout) = "
+															+ Integer.toString(j));
+						if (rs1.next())
+						{
+							float revenue = rs1.getFloat("rev"); 
+							System.out.format("%-12.2f", revenue);
+							yearlySum += revenue;
+						}
+						rs1.close();
+					}
+					System.out.format("%-12.2f %n", yearlySum);				
+				}
+
+				float yearlySum = 0;
+				System.out.format("%-10s", "Col Tot");
+				for (int k = 1; k <= 12; k++)
+				{
+					ResultSet rs2 = stmt.executeQuery("select sum(Rate) as colTot from lab7_reservations where MONTH(Checkout) = " + Integer.toString(k));
+					if (rs2.next())
+					{
+						float columnTotal = rs2.getFloat("colTot");
+						System.out.format("%-12.2f", columnTotal);
+						yearlySum += columnTotal;
+					}
+				}
+				System.out.format("%-12.2f %n", yearlySum);				
+
 			}
 			conn.close();
 		}
