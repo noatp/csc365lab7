@@ -562,6 +562,7 @@ public class InnReservation {
 				ResultSet lookUpResult = lookUp.executeQuery();
 				if (lookUpResult.next())
 				{
+					Room = lookUpResult.getString("Room");
 					System.out.println("Found a record");
 					if (userInput[1].equals("NC"))
 					{
