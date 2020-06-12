@@ -342,7 +342,7 @@ public class InnReservation {
 			}
 			LocalDate begin = LocalDate.parse(stringArray[3]);
 			LocalDate end = LocalDate.parse(stringArray[4]);
-			while (end.compareTo(begin) < 0){
+			while (end.compareTo(begin) <= 0){
 				System.out.println("End date should be greater than begin date");
 				System.out.print("End date (YYYY-MM-DD): ");
 				stringArray[4] = reader.readLine();
@@ -393,7 +393,7 @@ public class InnReservation {
 			}
 			LocalDate begin = LocalDate.parse(stringArray[3]);
 			LocalDate end = LocalDate.parse(stringArray[4]);
-			while (end.compareTo(begin) < 0){
+			while (end.compareTo(begin) <= 0){
 				System.out.println("End date should be greater than begin date");
 				System.out.print("End date (YYYY-MM-DD): ");
 				stringArray[4] = reader.readLine();
