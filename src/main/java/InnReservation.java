@@ -346,6 +346,10 @@ public class InnReservation {
 				System.out.println("End date should be greater than begin date");
 				System.out.print("End date (YYYY-MM-DD): ");
 				stringArray[4] = reader.readLine();
+				while (!checkDateFormat(stringArray[4])) {
+					System.out.print("End date (YYYY-MM-DD): ");
+					stringArray[4] = reader.readLine();
+				}
 				end = LocalDate.parse(stringArray[4]);
 			}
 			System.out.print("Number of children: ");
@@ -393,6 +397,10 @@ public class InnReservation {
 				System.out.println("End date should be greater than begin date");
 				System.out.print("End date (YYYY-MM-DD): ");
 				stringArray[4] = reader.readLine();
+				while (!checkDateFormat(stringArray[4])) {
+					System.out.print("End date (YYYY-MM-DD): ");
+					stringArray[4] = reader.readLine();
+				}
 				end = LocalDate.parse(stringArray[4]);
 			}
 			System.out.print("Number of children: ");
