@@ -24,6 +24,8 @@
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.DriverManager;
@@ -61,8 +63,10 @@ public class InnReservation {
 			hp.initDb();
 			hp.demo1();
 			printOption();
-			while(!(option = new Scanner(System.in).next()).equals("Q"))
+			option = new Scanner(System.in).next();
+			while(!(option.equals("Q")) || !option.equals("q"))
 			{
+				option = option.toUpperCase();
 				switch(option) {
 					case "demo":
 						hp.demo1();
@@ -89,6 +93,7 @@ public class InnReservation {
 						break;
 				}
 				printOption();
+				option = new Scanner(System.in).next();
 			}
 
 		} catch (SQLException e) {
@@ -228,7 +233,8 @@ public class InnReservation {
 		{	
 			try (Statement stmt = conn.createStatement()) 
 			{
-				ResultSet rs = stmt.executeQuery("SELECT * FROM lab7_rooms");
+				System.out.println("roomCode, roomName, beds, bedType, maxOcc, basePrice, decor, nextAvailableDate, nextStartDate");
+				ResultSet rs = stmt.executeQuery("SELECT * FROM lab7_rooms order by RoomName");
 				while (rs.next())
 				{
 					String roomCode = rs.getString("RoomCode");
@@ -302,6 +308,12 @@ public class InnReservation {
 		}
 	}
 	
+	private boolean checkDateFormat(String date) {
+		if (date.matches("^([1-9][0-9]{3})\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$"))
+			return true;
+		System.out.println("Bad format (YYYY-DD-MM)");
+		return false;
+	}
 
 	private String[] FR2ReservationInput()
 	{
@@ -318,8 +330,24 @@ public class InnReservation {
 			stringArray[2] = reader.readLine();
 			System.out.print("Begin date (YYYY-MM-DD): ");
 			stringArray[3] = reader.readLine();
+			while (!checkDateFormat(stringArray[3])) {
+				System.out.print("Begin date (YYYY-MM-DD): ");
+				stringArray[3] = reader.readLine();
+			}
 			System.out.print("End date (YYYY-MM-DD): ");
 			stringArray[4] = reader.readLine();
+			while (!checkDateFormat(stringArray[4])) {
+				System.out.print("End date (YYYY-MM-DD): ");
+				stringArray[4] = reader.readLine();
+			}
+			LocalDate begin = LocalDate.parse(stringArray[3]);
+			LocalDate end = LocalDate.parse(stringArray[4]);
+			while (end.compareTo(begin) < 0){
+				System.out.println("End date should be greater than begin date");
+				System.out.print("End date (YYYY-MM-DD): ");
+				stringArray[4] = reader.readLine();
+				end = LocalDate.parse(stringArray[4]);
+			}
 			System.out.print("Number of children: ");
 			stringArray[5] = reader.readLine();
 			System.out.print("Number of adult: ");
@@ -349,8 +377,24 @@ public class InnReservation {
 			stringArray[2] = reader.readLine();
 			System.out.print("Begin date (YYYY-MM-DD): ");
 			stringArray[3] = reader.readLine();
+			while (!checkDateFormat(stringArray[3])) {
+				System.out.print("Begin date (YYYY-MM-DD): ");
+				stringArray[3] = reader.readLine();
+			}
 			System.out.print("End date (YYYY-MM-DD): ");
 			stringArray[4] = reader.readLine();
+			while (!checkDateFormat(stringArray[4])) {
+				System.out.print("End date (YYYY-MM-DD): ");
+				stringArray[4] = reader.readLine();
+			}
+			LocalDate begin = LocalDate.parse(stringArray[3]);
+			LocalDate end = LocalDate.parse(stringArray[4]);
+			while (end.compareTo(begin) < 0){
+				System.out.println("End date should be greater than begin date");
+				System.out.print("End date (YYYY-MM-DD): ");
+				stringArray[4] = reader.readLine();
+				end = LocalDate.parse(stringArray[4]);
+			}
 			System.out.print("Number of children: ");
 			stringArray[5] = reader.readLine();
 			System.out.print("Number of adult: ");
@@ -465,7 +509,7 @@ public class InnReservation {
 							System.out.println("Begin date: " + userInput[3] + ", end date: " + userInput[4]);
 							System.out.println("Number of adults: " + userInput[6]);
 							System.out.println("Number of children: " + userInput[5]);
-							System.out.println("Total cose: " + total);
+							System.out.println("Total cost: " + total);
 
 							
 						}
@@ -621,9 +665,33 @@ public class InnReservation {
 				if (lookUpResult.next())
 				{
 					try (Statement stmt = conn.createStatement()) {
-						System.out.println("Remove entry");
-						stmt.execute("delete from lab7_reservations where Code = '" + userInput + "'");
-						stmt.close();
+						try
+							{
+								String input;
+								System.out.print("Are you sure want to cancel the reservation " + userInput + " (Y/N): ");
+								BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+								input = reader.readLine();  // Read user input
+								input = input.toUpperCase();
+								while (!(input.equals("Y") || input.equals("N")))
+								{
+									System.out.print("Please enter Y or N: ");
+									input = reader.readLine();  // Read user input
+									input = input.toUpperCase();
+								}
+								if (input.equals("Y"))
+								{
+									stmt.execute("delete from lab7_reservations where Code = '" + userInput + "'");
+									System.out.println("The reservation has been canceled.");
+									stmt.close();
+								} else {
+									System.out.println("The reservation has not been canceled.");
+								}
+							}
+							catch (IOException e)
+							{
+								System.err.println("SQLException: " + e.getMessage());
+							}	
+
 					}
 				}
 				else
@@ -654,6 +722,7 @@ public class InnReservation {
 		{	
 			try (Statement stmt = conn.createStatement()) 
 			{
+				System.out.printf("%-10s%-12s%-12s%-12s%-12s%-12s%-12s%-12s%-12s%-12s%-12s%-12s%-12s%-12s\n", "Room","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Anual");
 				List<String> roomCodes = new ArrayList<String>();
 				ResultSet rs = stmt.executeQuery("select * from lab7_rooms");
 				while (rs.next())
