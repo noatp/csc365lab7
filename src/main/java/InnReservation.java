@@ -1,27 +1,3 @@
-// import java.sql.ResultSet;
-// import java.sql.Statement;
-// import java.text.ParseException;
-// import java.text.SimpleDateFormat;
-// import java.io.BufferedReader;
-// import java.io.IOException;
-// import java.io.InputStreamReader;
-// import java.sql.Connection;
-// import java.sql.Date;
-// import java.sql.SQLException;
-// import java.sql.DriverManager;
-// import java.sql.PreparedStatement;
-
-// import java.util.Map;
-// import java.util.Scanner;
-
-// import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
-
-// import java.util.LinkedHashMap;
-// import java.time.LocalDate;
-// import java.util.List;
-// import java.util.ArrayList;
-// import java.util.Calendar;
-
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.ParseException;
@@ -309,11 +285,35 @@ public class InnReservation {
 		}
 	}
 	
-	private boolean checkDateFormat(String date) {
-		if (date.matches("^([1-9][0-9]{3})\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$"))
-			return true;
-		System.out.println("Bad format (YYYY-DD-MM)");
+	private boolean checkDateFormat(String date, boolean isFR3) {
+		if (isFR3)
+		{
+			if (date.matches("^([1-9][0-9]{3})\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$") || date.matches("NC") || date.matches("nc"))
+				return true;
+		} else {
+			if (date.matches("^([1-9][0-9]{3})\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$"))
+				return true;
+		}
+		if (isFR3) {
+			System.out.println("Bad format (YYYY-DD-MM) or NC if no change");
+		} else {
+			System.out.println("Bad format (YYYY-DD-MM)");
+		}
 		return false;
+	}
+
+	private boolean checkValidIntegerInput(String input) {
+		try
+		{
+			int num=Integer.parseInt(input);
+			return true;
+		}
+		catch(NumberFormatException e)
+		{
+			//If number is not integer,you wil get exception and exception message will be printed
+			System.out.println("Invalid input");
+			return false;
+		}
 	}
 
 	private String[] FR2ReservationInput()
@@ -324,39 +324,49 @@ public class InnReservation {
 			System.out.println("Please input these information:");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 			System.out.print("First name: ");
-			stringArray[0] = reader.readLine();  // Read user input
+			stringArray[0] = reader.readLine().toUpperCase();  // Read user input
 			System.out.print("Last name: ");
-			stringArray[1] = reader.readLine();
+			stringArray[1] = reader.readLine().toUpperCase();
 			System.out.print("Room code: ");
-			stringArray[2] = reader.readLine();
+			stringArray[2] = reader.readLine().toUpperCase();
 			System.out.print("Begin date (YYYY-MM-DD): ");
-			stringArray[3] = reader.readLine();
-			while (!checkDateFormat(stringArray[3])) {
+			stringArray[3] = reader.readLine().toUpperCase();
+			while (!checkDateFormat(stringArray[3], false)) {
 				System.out.print("Begin date (YYYY-MM-DD): ");
-				stringArray[3] = reader.readLine();
+				stringArray[3] = reader.readLine().toUpperCase();
 			}
 			System.out.print("End date (YYYY-MM-DD): ");
-			stringArray[4] = reader.readLine();
-			while (!checkDateFormat(stringArray[4])) {
+			stringArray[4] = reader.readLine().toUpperCase();
+			while (!checkDateFormat(stringArray[4], false)) {
 				System.out.print("End date (YYYY-MM-DD): ");
-				stringArray[4] = reader.readLine();
+				stringArray[4] = reader.readLine().toUpperCase();
 			}
 			LocalDate begin = LocalDate.parse(stringArray[3]);
 			LocalDate end = LocalDate.parse(stringArray[4]);
 			while (end.compareTo(begin) <= 0){
 				System.out.println("End date should be greater than begin date");
 				System.out.print("End date (YYYY-MM-DD): ");
-				stringArray[4] = reader.readLine();
-				while (!checkDateFormat(stringArray[4])) {
+				stringArray[4] = reader.readLine().toUpperCase();
+				while (!checkDateFormat(stringArray[4], false)) {
 					System.out.print("End date (YYYY-MM-DD): ");
-					stringArray[4] = reader.readLine();
+					stringArray[4] = reader.readLine().toUpperCase();
 				}
 				end = LocalDate.parse(stringArray[4]);
 			}
 			System.out.print("Number of children: ");
-			stringArray[5] = reader.readLine();
+			stringArray[5] = reader.readLine().toUpperCase();
+			while (!checkValidIntegerInput(stringArray[5]))
+			{
+				System.out.print("Number of children: ");
+				stringArray[5] = reader.readLine().toUpperCase();
+			}
 			System.out.print("Number of adult: ");
-			stringArray[6] = reader.readLine();
+			stringArray[6] = reader.readLine().toUpperCase();
+			while (!checkValidIntegerInput(stringArray[6]))
+			{
+				System.out.print("Number of adult: ");
+				stringArray[6] = reader.readLine().toUpperCase();
+			}
 			//System.out.println(stringArray);
 			return stringArray;
 		}
@@ -372,42 +382,63 @@ public class InnReservation {
 		try
 		{
 			String[] stringArray = new String[7];
-			System.out.println("Please input these information, enter NC if no change is needed:");
+			System.out.println("Please input these information, enter NC if no change is needed except the reservation code:");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 			System.out.print("Reservation code: ");
-			stringArray[0] = reader.readLine();  // Read user input
+			stringArray[0] = reader.readLine().toUpperCase();  // Read user input
+			while (!checkValidIntegerInput(stringArray[0]))
+			{
+				System.out.print("Reservation code: ");
+				stringArray[0] = reader.readLine().toUpperCase();  // Read user input
+			}
 			System.out.print("First name: ");
-			stringArray[1] = reader.readLine();
+			stringArray[1] = reader.readLine().toUpperCase();
 			System.out.print("Last name: ");
-			stringArray[2] = reader.readLine();
+			stringArray[2] = reader.readLine().toUpperCase();
 			System.out.print("Begin date (YYYY-MM-DD): ");
-			stringArray[3] = reader.readLine();
-			while (!checkDateFormat(stringArray[3])) {
+			stringArray[3] = reader.readLine().toUpperCase();
+			while (!checkDateFormat(stringArray[3], true)) {
 				System.out.print("Begin date (YYYY-MM-DD): ");
-				stringArray[3] = reader.readLine();
+				stringArray[3] = reader.readLine().toUpperCase();
 			}
 			System.out.print("End date (YYYY-MM-DD): ");
-			stringArray[4] = reader.readLine();
-			while (!checkDateFormat(stringArray[4])) {
+			stringArray[4] = reader.readLine().toUpperCase();
+			while (!checkDateFormat(stringArray[4], true)) {
 				System.out.print("End date (YYYY-MM-DD): ");
-				stringArray[4] = reader.readLine();
+				stringArray[4] = reader.readLine().toUpperCase();
 			}
-			LocalDate begin = LocalDate.parse(stringArray[3]);
-			LocalDate end = LocalDate.parse(stringArray[4]);
-			while (end.compareTo(begin) <= 0){
-				System.out.println("End date should be greater than begin date");
-				System.out.print("End date (YYYY-MM-DD): ");
-				stringArray[4] = reader.readLine();
-				while (!checkDateFormat(stringArray[4])) {
+			if (!(stringArray[3].toUpperCase().equals("NC") || stringArray[4].toUpperCase().equals("NC"))) {
+				LocalDate begin = LocalDate.parse(stringArray[3]);
+				LocalDate end = LocalDate.parse(stringArray[4]);
+				while (end.compareTo(begin) <= 0){
+					System.out.println("End date should be greater than begin date");
 					System.out.print("End date (YYYY-MM-DD): ");
-					stringArray[4] = reader.readLine();
+					stringArray[4] = reader.readLine().toUpperCase();
+					while (!checkDateFormat(stringArray[4], true)) {
+						System.out.print("End date (YYYY-MM-DD): ");
+						stringArray[4] = reader.readLine().toUpperCase();
+					}
+					end = LocalDate.parse(stringArray[4]);
 				}
-				end = LocalDate.parse(stringArray[4]);
 			}
 			System.out.print("Number of children: ");
-			stringArray[5] = reader.readLine();
+			stringArray[5] = reader.readLine().toUpperCase();
+			if (!stringArray[5].equals("NC")) {
+				while (!checkValidIntegerInput(stringArray[5]))
+				{
+					System.out.print("Number of children: ");
+					stringArray[5] = reader.readLine().toUpperCase();
+				}
+			}
 			System.out.print("Number of adult: ");
-			stringArray[6] = reader.readLine();
+			stringArray[6] = reader.readLine().toUpperCase();
+			if (!stringArray[6].equals("NC")) {
+				while (!checkValidIntegerInput(stringArray[5]))
+				{
+					System.out.print("Number of adult: ");
+					stringArray[6] = reader.readLine().toUpperCase();
+				}
+			}
 			//System.out.println(stringArray);
 			return stringArray;
 		}
@@ -595,6 +626,12 @@ public class InnReservation {
 				}
 				lookUpResult.close();
 				lookUp.close();
+			}
+			LocalDate begin = LocalDate.parse(userInput[3]);
+			LocalDate end = LocalDate.parse(userInput[4]);
+			if (end.compareTo(begin) <= 0){
+					System.out.println("End date should be greater than begin date");
+					return;
 			}
 
 			try (PreparedStatement pstmt = conn.prepareStatement("SELECT * " +
