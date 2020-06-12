@@ -222,6 +222,7 @@ public class InnReservation {
 		{
 			Class.forName("org.h2.Driver");
 			System.out.println("H2 JDBC Driver loaded");
+			System.out.println();
 		}
 		catch (ClassNotFoundException ex) 
 		{
