@@ -228,7 +228,7 @@ public class InnReservation {
 		{	
 			try (Statement stmt = conn.createStatement()) 
 			{
-				ResultSet rs = stmt.executeQuery("SELECT * FROM lab7_rooms");
+				ResultSet rs = stmt.executeQuery("SELECT * FROM lab7_rooms order by RoomName");
 				while (rs.next())
 				{
 					String roomCode = rs.getString("RoomCode");
